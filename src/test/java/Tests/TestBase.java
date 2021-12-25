@@ -1,23 +1,17 @@
 package Tests;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
-
 import java.time.Duration;
 
 import com.relevantcodes.extentreports.LogStatus;
-import io.cucumber.java.Before;
-import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.testng.ITestResult;
 import org.testng.annotations.*;
 
@@ -34,12 +28,37 @@ public class TestBase {
     String CurrentPath = System.getProperty("user.dir");
     FileInputStream fis;
 
+
     @BeforeSuite
-    public void start() {
+   // @Parameters({"browser"})
+    public void setup() throws Exception{
+        String  browser="chrome";
 
         extent = new ExtentReports("extentReport.html", true);
-        System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") + "\\drivers\\chromedriver.exe");
-        driver = new ChromeDriver();
+
+        if(browser.equalsIgnoreCase("firefox")){
+            //create firefox instance
+            System.setProperty("webdriver.gecko.driver", System.getProperty("user.dir") + "\\drivers\\geckodriver.exe");
+            driver = new FirefoxDriver();
+        }
+        //Check if parameter passed as 'chrome'
+        else if(browser.equalsIgnoreCase("chrome")){
+            //set path to chromedriver.exe
+            System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") + "\\drivers\\chromedriver.exe");
+            //create chrome instance
+            driver = new ChromeDriver();
+        }
+        //Check if parameter passed as 'Edge'
+        else if(browser.equalsIgnoreCase("edge")){
+            //set path to Edge.exe
+            System.setProperty("webdriver.edge.driver", System.getProperty("user.dir") + "\\drivers\\edgedriver.exe");
+            //create Edge instance
+            driver = new EdgeDriver();
+        }
+        else{
+            //If no browser passed throw exception
+            throw new Exception("Browser is not correct");
+        }
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         driver.manage().window().maximize();
     }
